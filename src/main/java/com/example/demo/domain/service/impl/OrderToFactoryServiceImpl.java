@@ -6,11 +6,13 @@ import com.example.demo.application.model.request.OrderToFactoryRequest;
 import com.example.demo.application.model.response.OrderToFactoryClientResponse;
 import com.example.demo.domain.entity.order.OrderProductEntity;
 import com.example.demo.domain.entity.reseller.ResellerEntity;
+import com.example.demo.domain.enums.StatusOrderEnum;
 import com.example.demo.domain.model.order.ProductDTO;
 import com.example.demo.domain.service.OrderToFactoryService;
 import com.example.demo.infrastructure.client.FactoryClient;
 import com.example.demo.infrastructure.persistence.order.OrderProductRepository;
 import com.example.demo.infrastructure.persistence.reseller.ResellerRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,7 @@ public class OrderToFactoryServiceImpl implements OrderToFactoryService {
     @Autowired
     private FactoryClient factoryClient;
 
+    @Transactional
     public OrderToFactoryClientResponse createOrderToFactory(OrderToFactoryRequest request) {
         logger.info("Iniciando a criação de pedido na fábrica para o revendedor com ID: {}", request.getResellerId());
 
@@ -107,6 +110,7 @@ public class OrderToFactoryServiceImpl implements OrderToFactoryService {
 
         list.forEach(orderProduct -> {
             orderProduct.setFactoryProtocol(response.getProtocol());
+            orderProduct.getOrder().setStatus(StatusOrderEnum.SOLICITADO);
             orderProductRepository.save(orderProduct);
         });
 
